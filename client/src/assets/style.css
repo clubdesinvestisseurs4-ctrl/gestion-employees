@@ -1,0 +1,151 @@
+:root {
+  --color-primary: #1a6b3c;
+  --color-primary-dark: #134d2c;
+  --color-secondary: #e67e22;
+  --bg-body: #f4f6f5;
+  --bg-card: #ffffff;
+  --bg-sidebar: #123a23;
+  --text-main: #1f2a24;
+  --text-muted: #6b7a72;
+  --border: #e1e6e3;
+  --success: #2e7d32;
+  --danger: #c0392b;
+  --warning: #b9770e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-body);
+  color: var(--text-main);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: var(--color-primary-dark); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.btn-secondary { background: #6b7a72; }
+.btn.btn-secondary:hover { background: #57645d; }
+.btn.btn-danger { background: var(--danger); }
+.btn.btn-danger:hover { background: #962d20; }
+.btn.btn-outline { background: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
+.btn.btn-outline:hover { background: rgba(26,107,60,0.08); }
+.btn.btn-lg { padding: 16px 28px; font-size: 18px; border-radius: 12px; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.grid-kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.kpi {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.kpi .kpi-value { font-size: 28px; font-weight: 700; color: var(--color-primary); }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge.en_attente, .badge.brouillon { background: #fdf0dc; color: var(--warning); }
+.badge.approuvee, .badge.validee, .badge.complet { background: #e0f0e3; color: var(--success); }
+.badge.refusee { background: #fbe3e0; color: var(--danger); }
+.badge.payee { background: #dde7f5; color: #2c5fa8; }
+.badge.en_cours { background: #eee; color: var(--text-muted); }
+
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--color-primary); outline-offset: -1px; }
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.alert.error { background: #fbe3e0; color: var(--danger); }
+.alert.success { background: #e0f0e3; color: var(--success); }
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 18px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.tabs button.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+.muted { color: var(--text-muted); font-size: 13px; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
