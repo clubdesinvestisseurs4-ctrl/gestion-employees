@@ -50,16 +50,6 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'Gestion Employés API' });
 });
 
-// DEBUG TEMPORAIRE (public, sans auth) — à retirer une fois le nombre de hops Render confirmé.
-// Ouvrir directement dans le navigateur depuis le Wi-Fi de l'entreprise : /api/debug-ip
-app.get('/api/debug-ip', (req, res) => {
-  res.json({
-    xForwardedFor: req.headers['x-forwarded-for'] || null,
-    reqIp: req.ip,
-    socketRemoteAddress: req.socket.remoteAddress,
-  });
-});
-
 app.use((_req, res) => res.status(404).json({ error: 'Route introuvable' }));
 
 app.use((err, _req, res, _next) => {

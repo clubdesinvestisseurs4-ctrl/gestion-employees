@@ -19,12 +19,7 @@ const DEFAULT_CONFIG = {
 
 // GET /api/sites-config/ip-actuelle — utilisé par le bouton "Utiliser mon IP actuelle"
 router.get('/ip-actuelle', authenticateToken, (req, res) => {
-  // DEBUG TEMPORAIRE : à retirer une fois le bon nombre de hops Render confirmé (voir utils/ip.js)
-  res.json({
-    ip: getClientIp(req),
-    debugXForwardedFor: req.headers['x-forwarded-for'] || null,
-    debugReqIp: req.ip,
-  });
+  res.json({ ip: getClientIp(req) });
 });
 
 // GET /api/sites-config/:etablissement — admin only

@@ -46,8 +46,6 @@ async function regenererQr() {
 async function utiliserMonIp() {
   const res = await api.get('/api/sites-config/ip-actuelle');
   nouvelleIp.value = res.ip;
-  // DEBUG TEMPORAIRE : à retirer une fois le bon nombre de hops Render confirmé
-  success.value = `Brut X-Forwarded-For : ${res.debugXForwardedFor} | req.ip : ${res.debugReqIp}`;
 }
 
 function ajouterIp() {
