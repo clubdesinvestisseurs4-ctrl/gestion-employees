@@ -6,9 +6,12 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3003;
 
-// Render (et tout reverse proxy) est devant l'app : nécessaire pour que req.ip
-// reflète la vraie IP du client (utilisé pour le contrôle Wi-Fi du pointage).
-app.set('trust proxy', 1);
+// Render est derrière Cloudflare, qui ajoute lui-même un hop : la chaîne X-Forwarded-For
+// observée est "client, cloudflare, render-lb-interne" (3 entrées). Avec le socket direct,
+// il faut donc faire confiance à 3 hops pour que req.ip retombe sur la vraie IP du client
+// (utilisé pour le contrôle Wi-Fi du pointage). Si Render change son infra, revérifier via
+// GET /api/debug-ip depuis un poste connecté au Wi-Fi de l'entreprise.
+app.set('trust proxy', 3);
 
 app.use(cors({
   origin: [
