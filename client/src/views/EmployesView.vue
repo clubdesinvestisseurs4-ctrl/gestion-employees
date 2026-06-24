@@ -9,8 +9,8 @@ const error = ref('');
 const success = ref('');
 const submitting = ref(false);
 const editingId = ref(null);
-const resetPasswordId = ref(null);
-const nouveauMotDePasse = ref('');
+const resetPinId = ref(null);
+const nouveauPin = ref('');
 
 const ETABLISSEMENTS = [
   { id: 'ohinene', label: 'Hôtel Ohinéné' },
@@ -18,7 +18,7 @@ const ETABLISSEMENTS = [
 ];
 
 const emptyForm = () => ({
-  nom: '', prenom: '', username: '', password: '',
+  nom: '', prenom: '', pin: '',
   poste: '', telephone: '', salaireMensuel: '', heuresAttenduesMois: 208, heuresParJour: 8,
   etablissementsAccess: [],
 });
@@ -34,7 +34,7 @@ watch(() => auth.etablissementActif, charger);
 function startEdit(e) {
   editingId.value = e.id;
   Object.assign(form, {
-    nom: e.nom, prenom: e.prenom, username: e.username, password: '',
+    nom: e.nom, prenom: e.prenom, pin: '',
     poste: e.poste, telephone: e.telephone, salaireMensuel: e.salaireMensuel,
     heuresAttenduesMois: e.heuresAttenduesMois, heuresParJour: e.heuresParJour,
     etablissementsAccess: [...(e.etablissementsAccess || [])],
@@ -57,16 +57,17 @@ async function submit() {
         heuresParJour: Number(form.heuresParJour), etablissementsAccess: form.etablissementsAccess,
       });
       success.value = 'Employé mis à jour';
+      cancelEdit();
     } else {
-      await api.post('/api/employes', {
+      const cree = await api.post('/api/employes', {
         ...form,
         salaireMensuel: Number(form.salaireMensuel),
         heuresAttenduesMois: Number(form.heuresAttenduesMois),
         heuresParJour: Number(form.heuresParJour),
       });
-      success.value = 'Employé créé';
+      success.value = `Employé créé — matricule à communiquer à l'employé : ${cree.matricule}`;
+      cancelEdit();
     }
-    cancelEdit();
     await charger();
   } catch (err) {
     error.value = err.message;
@@ -82,14 +83,14 @@ async function desactiver(e) {
 }
 
 async function reinitialiser(e) {
-  if (!nouveauMotDePasse.value || nouveauMotDePasse.value.length < 6) {
-    error.value = 'Le nouveau mot de passe doit contenir au moins 6 caractères';
+  if (!/^\d{4}$/.test(nouveauPin.value)) {
+    error.value = 'Le PIN doit contenir exactement 4 chiffres';
     return;
   }
-  await api.post(`/api/employes/${e.id}/reinitialiser-mot-de-passe`, { nouveauMotDePasse: nouveauMotDePasse.value });
-  success.value = `Mot de passe de ${e.prenom} réinitialisé`;
-  resetPasswordId.value = null;
-  nouveauMotDePasse.value = '';
+  await api.post(`/api/employes/${e.id}/reinitialiser-pin`, { nouveauPin: nouveauPin.value });
+  success.value = `PIN de ${e.prenom} réinitialisé : ${nouveauPin.value}`;
+  resetPinId.value = null;
+  nouveauPin.value = '';
 }
 </script>
 
@@ -107,15 +108,12 @@ async function reinitialiser(e) {
           <div class="form-group" style="flex:1"><label>Nom</label><input v-model="form.nom" required /></div>
           <div class="form-group" style="flex:1"><label>Prénom</label><input v-model="form.prenom" required /></div>
         </div>
-        <div class="flex-between">
-          <div class="form-group" style="flex:1">
-            <label>Identifiant</label>
-            <input v-model="form.username" :disabled="!!editingId" required />
-          </div>
-          <div class="form-group" style="flex:1" v-if="!editingId">
-            <label>Mot de passe initial</label>
-            <input v-model="form.password" type="password" minlength="6" required />
-          </div>
+        <p v-if="!editingId" class="muted" style="margin-top:-6px">
+          Le matricule (identifiant de connexion) est généré automatiquement à la création — vous le communiquerez à l'employé.
+        </p>
+        <div class="form-group" v-if="!editingId" style="max-width:200px">
+          <label>Code PIN initial (4 chiffres)</label>
+          <input v-model="form.pin" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="ex: 1234" required />
         </div>
         <div class="flex-between">
           <div class="form-group" style="flex:1"><label>Poste</label><input v-model="form.poste" /></div>
@@ -143,17 +141,17 @@ async function reinitialiser(e) {
         <thead><tr><th>Matricule</th><th>Nom</th><th>Poste</th><th>Salaire mensuel</th><th>Établissements</th><th></th></tr></thead>
         <tbody>
           <tr v-for="e in employes" :key="e.id">
-            <td>{{ e.matricule }}</td>
+            <td><strong style="font-size:16px">{{ e.matricule }}</strong></td>
             <td>{{ e.prenom }} {{ e.nom }}</td>
             <td>{{ e.poste || '—' }}</td>
             <td>{{ e.salaireMensuel?.toLocaleString('fr-FR') }}</td>
             <td>{{ (e.etablissementsAccess || []).join(', ') }}</td>
             <td style="white-space:nowrap">
               <button class="btn btn-outline" style="padding:6px 10px" @click="startEdit(e)">Modifier</button>
-              <button class="btn btn-outline" style="padding:6px 10px;margin-left:6px" @click="resetPasswordId = resetPasswordId === e.id ? null : e.id">Mot de passe</button>
+              <button class="btn btn-outline" style="padding:6px 10px;margin-left:6px" @click="resetPinId = resetPinId === e.id ? null : e.id">PIN</button>
               <button class="btn btn-danger" style="padding:6px 10px;margin-left:6px" @click="desactiver(e)">Désactiver</button>
-              <div v-if="resetPasswordId === e.id" style="margin-top:8px;display:flex;gap:6px">
-                <input v-model="nouveauMotDePasse" type="password" placeholder="Nouveau mot de passe" minlength="6" />
+              <div v-if="resetPinId === e.id" style="margin-top:8px;display:flex;gap:6px">
+                <input v-model="nouveauPin" inputmode="numeric" pattern="\d{4}" maxlength="4" placeholder="Nouveau PIN" style="width:110px" />
                 <button class="btn" style="padding:6px 10px" @click="reinitialiser(e)">OK</button>
               </div>
             </td>

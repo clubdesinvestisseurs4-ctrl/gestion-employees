@@ -6,8 +6,10 @@ const { nextMatricule } = require('../utils/counters');
 
 const router = express.Router();
 
+const PIN_RE = /^\d{4}$/;
+
 function publicEmploye(doc) {
-  const { passwordHash, ...rest } = doc.data();
+  const { passwordHash, pinHash, ...rest } = doc.data();
   return { id: doc.id, ...rest };
 }
 
@@ -35,16 +37,19 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/employes — admin only, crée un compte employé
+// POST /api/employes — admin only, crée un compte employé (identifiant = matricule auto-généré, secret = PIN 4 chiffres)
 router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const {
-      nom, prenom, username, password, poste, telephone,
+      nom, prenom, pin, poste, telephone,
       salaireMensuel, heuresAttenduesMois, heuresParJour, etablissementsAccess,
     } = req.body;
 
-    if (!nom || !prenom || !username || !password) {
-      return res.status(400).json({ error: 'nom, prenom, username et password sont requis' });
+    if (!nom || !prenom || !pin) {
+      return res.status(400).json({ error: 'nom, prenom et pin sont requis' });
+    }
+    if (!PIN_RE.test(pin)) {
+      return res.status(400).json({ error: 'pin doit contenir exactement 4 chiffres' });
     }
     if (!Array.isArray(etablissementsAccess) || etablissementsAccess.length === 0) {
       return res.status(400).json({ error: 'etablissementsAccess doit contenir au moins un établissement' });
@@ -53,21 +58,16 @@ router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
       return res.status(400).json({ error: 'salaireMensuel doit être > 0' });
     }
 
-    const usernameNorm = username.toLowerCase().trim();
-    const existing = await db.collection('utilisateurs').where('username', '==', usernameNorm).limit(1).get();
-    if (!existing.empty) {
-      return res.status(409).json({ error: 'Cet identifiant est déjà utilisé' });
-    }
-
     const matricule = await nextMatricule();
-    const passwordHash = await bcrypt.hash(password, 10);
+    const pinHash = await bcrypt.hash(pin, 10);
 
     const employe = {
       matricule,
       nom,
       prenom,
-      username: usernameNorm,
-      passwordHash,
+      pinHash,
+      pinFailedAttempts: 0,
+      pinLockedUntil: null,
       role: 'employe',
       poste: poste || '',
       telephone: telephone || '',
@@ -80,7 +80,7 @@ router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
     };
 
     const ref = await db.collection('utilisateurs').add(employe);
-    const { passwordHash: _, ...safe } = employe;
+    const { pinHash: _, ...safe } = employe;
     res.status(201).json({ id: ref.id, ...safe });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -113,23 +113,23 @@ router.put('/:id', authenticateToken, requireRole('admin'), async (req, res) => 
   }
 });
 
-// POST /api/employes/:id/reinitialiser-mot-de-passe — admin only
-router.post('/:id/reinitialiser-mot-de-passe', authenticateToken, requireRole('admin'), async (req, res) => {
+// POST /api/employes/:id/reinitialiser-pin — admin only
+router.post('/:id/reinitialiser-pin', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
-    const { nouveauMotDePasse } = req.body;
-    if (!nouveauMotDePasse || nouveauMotDePasse.length < 6) {
-      return res.status(400).json({ error: 'nouveauMotDePasse doit contenir au moins 6 caractères' });
+    const { nouveauPin } = req.body;
+    if (!PIN_RE.test(nouveauPin || '')) {
+      return res.status(400).json({ error: 'nouveauPin doit contenir exactement 4 chiffres' });
     }
 
     const ref = db.collection('utilisateurs').doc(req.params.id);
     const doc = await ref.get();
-    if (!doc.exists) {
+    if (!doc.exists || doc.data().role !== 'employe') {
       return res.status(404).json({ error: 'Employé introuvable' });
     }
 
-    const passwordHash = await bcrypt.hash(nouveauMotDePasse, 10);
-    await ref.update({ passwordHash });
-    res.json({ message: 'Mot de passe réinitialisé' });
+    const pinHash = await bcrypt.hash(nouveauPin, 10);
+    await ref.update({ pinHash, pinFailedAttempts: 0, pinLockedUntil: null });
+    res.json({ message: 'PIN réinitialisé' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

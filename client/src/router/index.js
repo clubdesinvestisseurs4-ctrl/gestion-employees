@@ -3,6 +3,7 @@ import { useAuthStore } from '../stores/auth';
 
 const routes = [
   { path: '/login', name: 'login', component: () => import('../views/LoginView.vue'), meta: { public: true } },
+  { path: '/connexion', name: 'connexion-employe', component: () => import('../views/LoginEmployeView.vue'), meta: { public: true } },
 
   { path: '/', redirect: '/pointer' },
   { path: '/pointer', name: 'pointer', component: () => import('../views/PointerView.vue') },
@@ -27,9 +28,9 @@ router.beforeEach((to) => {
   const auth = useAuthStore();
 
   if (!to.meta.public && !auth.isAuthenticated) {
-    return { name: 'login' };
+    return { name: 'connexion-employe' };
   }
-  if (to.name === 'login' && auth.isAuthenticated) {
+  if ((to.name === 'login' || to.name === 'connexion-employe') && auth.isAuthenticated) {
     return { name: auth.isAdmin ? 'admin-dashboard' : 'pointer' };
   }
   if (to.meta.adminOnly && !auth.isAdmin) {

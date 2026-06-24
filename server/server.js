@@ -39,6 +39,17 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 
+// Limite plus généreuse que /login (admin) : plusieurs employés peuvent se connecter au même
+// moment depuis la même IP partagée du bureau. Le vrai garde-fou anti brute-force du PIN (4
+// chiffres, faible entropie) est le verrouillage par compte dans routes/auth.js (5 tentatives).
+const authEmployeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/auth/login-employe', authEmployeLimiter);
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/employes', require('./routes/employes'));
 app.use('/api/sites-config', require('./routes/sitesConfig'));

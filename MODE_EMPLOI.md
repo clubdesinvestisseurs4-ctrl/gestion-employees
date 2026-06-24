@@ -21,7 +21,11 @@ L'app s'ouvre alors comme une application normale, sans la barre du navigateur.
 
 ### Se connecter
 
-Identifiant et mot de passe sont créés par l'administrateur. Vous pouvez vous connecter et consulter vos heures/salaire ou soumettre une demande depuis n'importe où (pas besoin d'être au bureau pour ça) — **seul le pointage** exige d'être sur place.
+Pas de mot de passe à retenir : sur l'écran de connexion employé (`/connexion`), entrez votre **matricule** (un numéro, ex: `1001`) puis votre **code PIN à 4 chiffres** sur le pavé tactile — tout se fait en appuyant sur des chiffres, sans avoir besoin de lire ni écrire. Le matricule et le PIN initial vous sont communiqués par l'administrateur à la création de votre compte (vous pouvez changer votre PIN ensuite dans Profil).
+
+Vous pouvez vous connecter et consulter vos heures/salaire ou soumettre une demande depuis n'importe où (pas besoin d'être au bureau pour ça) — **seul le pointage** exige d'être sur place. Après 5 codes PIN erronés, le compte est bloqué 15 minutes par sécurité.
+
+La connexion administrateur (identifiant + mot de passe classique) se fait sur un écran séparé (`/login`), accessible via le lien "Connexion administrateur".
 
 ### Pointer (arrivée / départ)
 
@@ -60,7 +64,7 @@ Toutes les demandes passent par un statut **en attente → approuvée/refusée**
 
 ### Profil
 
-Vos informations (matricule, poste...) et le changement de mot de passe.
+Vos informations (matricule, poste...) et le changement de votre code PIN.
 
 ---
 
@@ -72,7 +76,7 @@ Vue d'ensemble de l'établissement sélectionné : nombre d'employés actifs, pr
 
 ### Employés
 
-Créer un compte employé (identifiant, mot de passe initial, poste, salaire mensuel, heures attendues par mois, établissement(s)), le modifier, réinitialiser son mot de passe, ou le désactiver (ne supprime pas son historique).
+Créer un compte employé (nom, prénom, code PIN initial à 4 chiffres, poste, salaire mensuel, heures attendues par mois, établissement(s)) — le matricule (identifiant de connexion, ex: `1001`) est généré automatiquement, à communiquer à l'employé avec son PIN. Vous pouvez aussi modifier l'employé, réinitialiser son PIN (en cas d'oubli ou de blocage après 5 erreurs), ou le désactiver (ne supprime pas son historique).
 
 ### Paramètres pointage — à configurer avant toute utilisation
 

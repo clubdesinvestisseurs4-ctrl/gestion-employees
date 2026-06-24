@@ -25,8 +25,7 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    async login(username, password) {
-      const data = await api.post('/api/auth/login', { username, password });
+    applySession(data) {
       this.token = data.token;
       this.user = data.user;
       saveSession(data.token, data.user);
@@ -34,6 +33,16 @@ export const useAuthStore = defineStore('auth', {
         this.setEtablissementActif(data.user.etablissementsAccess[0]);
       }
       this.scheduleExpiry();
+    },
+
+    async login(username, password) {
+      const data = await api.post('/api/auth/login', { username, password });
+      this.applySession(data);
+    },
+
+    async loginEmploye(matricule, pin) {
+      const data = await api.post('/api/auth/login-employe', { matricule, pin });
+      this.applySession(data);
     },
 
     logout() {

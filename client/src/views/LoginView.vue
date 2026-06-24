@@ -16,7 +16,7 @@ async function submit() {
   loading.value = true;
   try {
     await auth.login(username.value, password.value);
-    router.push(auth.isAdmin ? '/admin' : '/pointer');
+    router.push('/admin');
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -29,7 +29,7 @@ async function submit() {
   <div class="login-screen">
     <form class="card login-card" @submit.prevent="submit">
       <div class="login-brand">Gestion Employés</div>
-      <p class="muted">Hôtel Ohinéné &amp; Cook Africa</p>
+      <p class="muted">Connexion administrateur</p>
 
       <div v-if="error" class="alert error">{{ error }}</div>
 
@@ -45,6 +45,8 @@ async function submit() {
       <button class="btn" type="submit" :disabled="loading" style="width:100%">
         {{ loading ? 'Connexion...' : 'Se connecter' }}
       </button>
+
+      <router-link to="/connexion" class="admin-link">Connexion employé (matricule + PIN)</router-link>
     </form>
   </div>
 </template>
@@ -64,5 +66,12 @@ async function submit() {
   font-size: 20px;
   font-weight: 700;
   color: var(--color-primary);
+}
+.admin-link {
+  display: block;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
 }
 </style>

@@ -1,6 +1,8 @@
 const { db } = require('../firebase-admin');
 
-// Génère un matricule séquentiel du type EMP-0001 via un compteur transactionnel Firestore.
+// Génère un matricule séquentiel purement numérique (1001, 1002...) via un compteur
+// transactionnel Firestore. Volontairement sans lettres : l'employé doit pouvoir le saisir
+// sur un simple pavé numérique, sans savoir lire ni écrire.
 async function nextMatricule() {
   const counterRef = db.collection('compteurs').doc('employes');
 
@@ -12,7 +14,7 @@ async function nextMatricule() {
     return n;
   });
 
-  return `EMP-${String(next).padStart(4, '0')}`;
+  return String(1000 + next);
 }
 
 module.exports = { nextMatricule };

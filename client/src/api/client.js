@@ -2,8 +2,10 @@ import { getToken, forceLogout } from '../utils/session';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
+const LOGIN_PATHS = ['/api/auth/login', '/api/auth/login-employe'];
+
 function handleUnauthorized(path, status) {
-  if (status === 401 && path !== '/api/auth/login') {
+  if (status === 401 && !LOGIN_PATHS.includes(path)) {
     forceLogout();
     return true;
   }
