@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { db } = require('../firebase-admin');
 const { authenticateToken, requireRole } = require('../middleware/auth');
-const { nextMatricule } = require('../utils/counters');
+const { nextCodeConnexion } = require('../utils/counters');
 
 const router = express.Router();
 
@@ -37,16 +37,19 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/employes — admin only, crée un compte employé (identifiant = matricule auto-généré, secret = PIN 4 chiffres)
+// POST /api/employes — admin only, crée un compte employé.
+// matricule = identifiant officiel existant (saisi par l'admin, peut contenir des lettres).
+// codeConnexion = code purement numérique généré automatiquement, utilisé pour se connecter à
+// l'app (pavé numérique). pin = secret à 4 chiffres associé au compte.
 router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const {
-      nom, prenom, pin, poste, telephone,
+      matricule, nom, prenom, pin, poste, telephone,
       salaireMensuel, heuresAttenduesMois, heuresParJour, etablissementsAccess,
     } = req.body;
 
-    if (!nom || !prenom || !pin) {
-      return res.status(400).json({ error: 'nom, prenom et pin sont requis' });
+    if (!matricule || !nom || !prenom || !pin) {
+      return res.status(400).json({ error: 'matricule, nom, prenom et pin sont requis' });
     }
     if (!PIN_RE.test(pin)) {
       return res.status(400).json({ error: 'pin doit contenir exactement 4 chiffres' });
@@ -58,11 +61,18 @@ router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
       return res.status(400).json({ error: 'salaireMensuel doit être > 0' });
     }
 
-    const matricule = await nextMatricule();
+    const matriculeNorm = String(matricule).trim();
+    const existing = await db.collection('utilisateurs').where('matricule', '==', matriculeNorm).limit(1).get();
+    if (!existing.empty) {
+      return res.status(409).json({ error: 'Ce matricule est déjà utilisé' });
+    }
+
+    const codeConnexion = await nextCodeConnexion();
     const pinHash = await bcrypt.hash(pin, 10);
 
     const employe = {
-      matricule,
+      matricule: matriculeNorm,
+      codeConnexion,
       nom,
       prenom,
       pinHash,
@@ -87,7 +97,7 @@ router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
   }
 });
 
-// PUT /api/employes/:id — admin only, mise à jour partielle (hors mot de passe)
+// PUT /api/employes/:id — admin only, mise à jour partielle (hors PIN)
 router.put('/:id', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const ref = db.collection('utilisateurs').doc(req.params.id);
@@ -97,12 +107,24 @@ router.put('/:id', authenticateToken, requireRole('admin'), async (req, res) => 
     }
 
     const allowed = [
-      'nom', 'prenom', 'poste', 'telephone', 'salaireMensuel',
+      'matricule', 'nom', 'prenom', 'poste', 'telephone', 'salaireMensuel',
       'heuresAttenduesMois', 'heuresParJour', 'etablissementsAccess', 'actif',
     ];
     const updates = {};
     for (const key of allowed) {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
+    }
+
+    if (updates.matricule !== undefined) {
+      const matriculeNorm = String(updates.matricule).trim();
+      if (!matriculeNorm) {
+        return res.status(400).json({ error: 'matricule ne peut pas être vide' });
+      }
+      const existing = await db.collection('utilisateurs').where('matricule', '==', matriculeNorm).limit(1).get();
+      if (!existing.empty && existing.docs[0].id !== req.params.id) {
+        return res.status(409).json({ error: 'Ce matricule est déjà utilisé' });
+      }
+      updates.matricule = matriculeNorm;
     }
 
     await ref.update(updates);

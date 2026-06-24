@@ -66,6 +66,7 @@ async function changerPin() {
 
     <div class="card">
       <p><strong>Matricule :</strong> {{ auth.user?.matricule }}</p>
+      <p v-if="auth.user?.codeConnexion"><strong>Code de connexion :</strong> {{ auth.user?.codeConnexion }}</p>
       <p><strong>Nom :</strong> {{ auth.user?.prenom }} {{ auth.user?.nom }}</p>
       <p v-if="auth.user?.poste"><strong>Poste :</strong> {{ auth.user?.poste }}</p>
       <p v-if="auth.user?.telephone"><strong>Téléphone :</strong> {{ auth.user?.telephone }}</p>

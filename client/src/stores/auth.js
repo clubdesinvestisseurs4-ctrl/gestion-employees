@@ -40,8 +40,8 @@ export const useAuthStore = defineStore('auth', {
       this.applySession(data);
     },
 
-    async loginEmploye(matricule, pin) {
-      const data = await api.post('/api/auth/login-employe', { matricule, pin });
+    async loginEmploye(codeConnexion, pin) {
+      const data = await api.post('/api/auth/login-employe', { codeConnexion, pin });
       this.applySession(data);
     },
 

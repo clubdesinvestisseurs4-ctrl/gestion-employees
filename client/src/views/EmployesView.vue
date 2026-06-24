@@ -18,7 +18,7 @@ const ETABLISSEMENTS = [
 ];
 
 const emptyForm = () => ({
-  nom: '', prenom: '', pin: '',
+  matricule: '', nom: '', prenom: '', pin: '',
   poste: '', telephone: '', salaireMensuel: '', heuresAttenduesMois: 208, heuresParJour: 8,
   etablissementsAccess: [],
 });
@@ -34,7 +34,7 @@ watch(() => auth.etablissementActif, charger);
 function startEdit(e) {
   editingId.value = e.id;
   Object.assign(form, {
-    nom: e.nom, prenom: e.prenom, pin: '',
+    matricule: e.matricule, nom: e.nom, prenom: e.prenom, pin: '',
     poste: e.poste, telephone: e.telephone, salaireMensuel: e.salaireMensuel,
     heuresAttenduesMois: e.heuresAttenduesMois, heuresParJour: e.heuresParJour,
     etablissementsAccess: [...(e.etablissementsAccess || [])],
@@ -52,7 +52,7 @@ async function submit() {
   try {
     if (editingId.value) {
       await api.put(`/api/employes/${editingId.value}`, {
-        nom: form.nom, prenom: form.prenom, poste: form.poste, telephone: form.telephone,
+        matricule: form.matricule, nom: form.nom, prenom: form.prenom, poste: form.poste, telephone: form.telephone,
         salaireMensuel: Number(form.salaireMensuel), heuresAttenduesMois: Number(form.heuresAttenduesMois),
         heuresParJour: Number(form.heuresParJour), etablissementsAccess: form.etablissementsAccess,
       });
@@ -65,7 +65,7 @@ async function submit() {
         heuresAttenduesMois: Number(form.heuresAttenduesMois),
         heuresParJour: Number(form.heuresParJour),
       });
-      success.value = `Employé créé — matricule à communiquer à l'employé : ${cree.matricule}`;
+      success.value = `Employé créé — code de connexion à communiquer à l'employé : ${cree.codeConnexion}`;
       cancelEdit();
     }
     await charger();
@@ -105,11 +105,14 @@ async function reinitialiser(e) {
 
       <form @submit.prevent="submit">
         <div class="flex-between">
+          <div class="form-group" style="flex:1"><label>Matricule (existant)</label><input v-model="form.matricule" placeholder="ex: EMP-001" required /></div>
+        </div>
+        <div class="flex-between">
           <div class="form-group" style="flex:1"><label>Nom</label><input v-model="form.nom" required /></div>
           <div class="form-group" style="flex:1"><label>Prénom</label><input v-model="form.prenom" required /></div>
         </div>
         <p v-if="!editingId" class="muted" style="margin-top:-6px">
-          Le matricule (identifiant de connexion) est généré automatiquement à la création — vous le communiquerez à l'employé.
+          Un code de connexion numérique sera généré automatiquement (distinct du matricule) — c'est lui que l'employé utilisera pour se connecter à l'app, avec le PIN ci-dessous.
         </p>
         <div class="form-group" v-if="!editingId" style="max-width:200px">
           <label>Code PIN initial (4 chiffres)</label>
@@ -138,10 +141,11 @@ async function reinitialiser(e) {
 
     <div class="card">
       <table>
-        <thead><tr><th>Matricule</th><th>Nom</th><th>Poste</th><th>Salaire mensuel</th><th>Établissements</th><th></th></tr></thead>
+        <thead><tr><th>Matricule</th><th>Code connexion</th><th>Nom</th><th>Poste</th><th>Salaire mensuel</th><th>Établissements</th><th></th></tr></thead>
         <tbody>
           <tr v-for="e in employes" :key="e.id">
-            <td><strong style="font-size:16px">{{ e.matricule }}</strong></td>
+            <td>{{ e.matricule }}</td>
+            <td><strong style="font-size:16px">{{ e.codeConnexion }}</strong></td>
             <td>{{ e.prenom }} {{ e.nom }}</td>
             <td>{{ e.poste || '—' }}</td>
             <td>{{ e.salaireMensuel?.toLocaleString('fr-FR') }}</td>
@@ -156,7 +160,7 @@ async function reinitialiser(e) {
               </div>
             </td>
           </tr>
-          <tr v-if="!employes.length"><td colspan="6" class="muted">Aucun employé</td></tr>
+          <tr v-if="!employes.length"><td colspan="7" class="muted">Aucun employé</td></tr>
         </tbody>
       </table>
     </div>

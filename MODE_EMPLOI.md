@@ -21,7 +21,7 @@ L'app s'ouvre alors comme une application normale, sans la barre du navigateur.
 
 ### Se connecter
 
-Pas de mot de passe à retenir : sur l'écran de connexion employé (`/connexion`), entrez votre **matricule** (un numéro, ex: `1001`) puis votre **code PIN à 4 chiffres** sur le pavé tactile — tout se fait en appuyant sur des chiffres, sans avoir besoin de lire ni écrire. Le matricule et le PIN initial vous sont communiqués par l'administrateur à la création de votre compte (vous pouvez changer votre PIN ensuite dans Profil).
+Pas de mot de passe à retenir : sur l'écran de connexion employé (`/connexion`), entrez votre **code de connexion** (un numéro, ex: `1001` — différent de votre matricule officiel, qui peut contenir des lettres) puis votre **code PIN à 4 chiffres** sur le pavé tactile — tout se fait en appuyant sur des chiffres, sans avoir besoin de lire ni écrire. Le code de connexion et le PIN initial vous sont communiqués par l'administrateur à la création de votre compte (vous pouvez changer votre PIN ensuite dans Profil).
 
 Vous pouvez vous connecter et consulter vos heures/salaire ou soumettre une demande depuis n'importe où (pas besoin d'être au bureau pour ça) — **seul le pointage** exige d'être sur place. Après 5 codes PIN erronés, le compte est bloqué 15 minutes par sécurité.
 
@@ -76,7 +76,7 @@ Vue d'ensemble de l'établissement sélectionné : nombre d'employés actifs, pr
 
 ### Employés
 
-Créer un compte employé (nom, prénom, code PIN initial à 4 chiffres, poste, salaire mensuel, heures attendues par mois, établissement(s)) — le matricule (identifiant de connexion, ex: `1001`) est généré automatiquement, à communiquer à l'employé avec son PIN. Vous pouvez aussi modifier l'employé, réinitialiser son PIN (en cas d'oubli ou de blocage après 5 erreurs), ou le désactiver (ne supprime pas son historique).
+Créer un compte employé (matricule existant, nom, prénom, code PIN initial à 4 chiffres, poste, salaire mensuel, heures attendues par mois, établissement(s)) — un **code de connexion** numérique (ex: `1001`) est généré automatiquement, distinct du matricule, à communiquer à l'employé avec son PIN (c'est ce code qu'il utilisera pour se connecter à l'app). Vous pouvez aussi modifier l'employé, réinitialiser son PIN (en cas d'oubli ou de blocage après 5 erreurs), ou le désactiver (ne supprime pas son historique).
 
 ### Paramètres pointage — à configurer avant toute utilisation
 

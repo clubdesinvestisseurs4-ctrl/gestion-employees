@@ -94,24 +94,25 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/login-employe — connexion employé par matricule + PIN 4 chiffres (pas de mot de passe à lire/mémoriser)
+// POST /api/auth/login-employe — connexion employé par code de connexion + PIN 4 chiffres
+// (le code de connexion est numérique, distinct du matricule officiel qui peut contenir des lettres)
 router.post('/login-employe', async (req, res) => {
   try {
-    const { matricule, pin } = req.body;
-    if (!matricule || !pin) {
-      return res.status(400).json({ error: 'matricule et pin sont requis' });
+    const { codeConnexion, pin } = req.body;
+    if (!codeConnexion || !pin) {
+      return res.status(400).json({ error: 'codeConnexion et pin sont requis' });
     }
 
     const snap = await db
       .collection('utilisateurs')
-      .where('matricule', '==', String(matricule).trim())
+      .where('codeConnexion', '==', String(codeConnexion).trim())
       .where('role', '==', 'employe')
       .where('actif', '==', true)
       .limit(1)
       .get();
 
     if (snap.empty) {
-      return res.status(401).json({ error: 'Matricule ou code PIN incorrect' });
+      return res.status(401).json({ error: 'Code de connexion ou PIN incorrect' });
     }
 
     const doc = snap.docs[0];
@@ -131,7 +132,7 @@ router.post('/login-employe', async (req, res) => {
         updates.pinFailedAttempts = 0;
       }
       await doc.ref.update(updates);
-      return res.status(401).json({ error: 'Matricule ou code PIN incorrect' });
+      return res.status(401).json({ error: 'Code de connexion ou PIN incorrect' });
     }
 
     if (user.pinFailedAttempts || user.pinLockedUntil) {

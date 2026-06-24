@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import NumPad from '../components/NumPad.vue';
 
-const etape = ref('matricule'); // 'matricule' | 'pin'
-const matricule = ref('');
+const etape = ref('code'); // 'code' | 'pin'
+const codeConnexion = ref('');
 const pin = ref('');
 const error = ref('');
 const loading = ref(false);
@@ -14,13 +14,13 @@ const auth = useAuthStore();
 const router = useRouter();
 
 function allerAuPin() {
-  if (!matricule.value) return;
+  if (!codeConnexion.value) return;
   error.value = '';
   etape.value = 'pin';
 }
 
 function retour() {
-  etape.value = 'matricule';
+  etape.value = 'code';
   pin.value = '';
   error.value = '';
 }
@@ -30,7 +30,7 @@ async function valider() {
   error.value = '';
   loading.value = true;
   try {
-    await auth.loginEmploye(matricule.value, pin.value);
+    await auth.loginEmploye(codeConnexion.value, pin.value);
     router.push('/pointer');
   } catch (err) {
     error.value = err.message;
@@ -49,14 +49,14 @@ async function valider() {
 
       <div v-if="error" class="alert error">{{ error }}</div>
 
-      <template v-if="etape === 'matricule'">
-        <p class="numpad-question">Quel est votre matricule ?</p>
-        <NumPad v-model="matricule" :max-length="6" @complete="allerAuPin" />
-        <button class="btn btn-lg" style="width:100%;margin-top:18px" :disabled="!matricule" @click="allerAuPin">Suivant</button>
+      <template v-if="etape === 'code'">
+        <p class="numpad-question">Quel est votre code de connexion ?</p>
+        <NumPad v-model="codeConnexion" :max-length="6" @complete="allerAuPin" />
+        <button class="btn btn-lg" style="width:100%;margin-top:18px" :disabled="!codeConnexion" @click="allerAuPin">Suivant</button>
       </template>
 
       <template v-else>
-        <p class="numpad-question">Code PIN de {{ matricule }}</p>
+        <p class="numpad-question">Code PIN de {{ codeConnexion }}</p>
         <NumPad v-model="pin" :max-length="4" masked @complete="valider" />
         <button class="btn btn-lg" style="width:100%;margin-top:18px" :disabled="loading || !pin" @click="valider">
           {{ loading ? 'Connexion…' : 'Se connecter' }}
