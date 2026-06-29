@@ -40,18 +40,28 @@ function geolocationErrorMessage(err) {
   return "Impossible d'obtenir votre position. Vérifiez que la localisation est activée.";
 }
 
-function getPosition() {
+function getPositionOnce(options) {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error("La géolocalisation n'est pas disponible sur cet appareil"));
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(pos.coords),
-      (err) => reject(new Error(geolocationErrorMessage(err))),
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
+    navigator.geolocation.getCurrentPosition((pos) => resolve(pos.coords), reject, options);
   });
+}
+
+async function getPosition() {
+  if (!navigator.geolocation) {
+    throw new Error("La géolocalisation n'est pas disponible sur cet appareil");
+  }
+  try {
+    // 1ère tentative : haute précision (GPS), peut être lente en intérieur.
+    return await getPositionOnce({ enableHighAccuracy: true, timeout: 20000 });
+  } catch {
+    // Repli : position réseau/Wi-Fi (moins précise mais plus rapide à obtenir),
+    // accepte une position récente déjà connue de l'appareil pour répondre plus vite.
+    try {
+      return await getPositionOnce({ enableHighAccuracy: false, timeout: 12000, maximumAge: 30000 });
+    } catch (err) {
+      throw new Error(geolocationErrorMessage(err));
+    }
+  }
 }
 
 async function startPointage() {
