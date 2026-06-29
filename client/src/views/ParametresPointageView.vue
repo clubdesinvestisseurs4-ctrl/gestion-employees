@@ -10,6 +10,8 @@ const qrImage = ref('');
 const nouvelleIp = ref('');
 
 const config = reactive({ allowedIps: [], gpsLat: null, gpsLng: null, gpsRadiusMeters: 150 });
+const gpsAccuracy = ref(null);
+const gpsCapturing = ref(false);
 
 async function charger() {
   if (!auth.etablissementActif) return;
@@ -60,13 +62,21 @@ function retirerIp(ip) {
 }
 
 function utiliserMaPosition() {
+  error.value = '';
+  gpsAccuracy.value = null;
+  gpsCapturing.value = true;
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       config.gpsLat = pos.coords.latitude;
       config.gpsLng = pos.coords.longitude;
+      gpsAccuracy.value = Math.round(pos.coords.accuracy);
+      gpsCapturing.value = false;
     },
-    (err) => { error.value = 'Impossible d\'obtenir votre position : ' + err.message; },
-    { enableHighAccuracy: true }
+    (err) => {
+      error.value = 'Impossible d\'obtenir votre position : ' + err.message;
+      gpsCapturing.value = false;
+    },
+    { enableHighAccuracy: true, timeout: 20000 }
   );
 }
 
@@ -119,7 +129,18 @@ async function enregistrer() {
 
     <div class="card">
       <h3 style="margin-top:0">Position GPS du site</h3>
-      <button class="btn btn-outline" style="margin-bottom:12px" @click="utiliserMaPosition">Utiliser ma position actuelle</button>
+      <p class="muted">
+        Pour un lieu fixe (hôtel, restaurant), le plus fiable est de chercher l'adresse sur Google Maps sur un
+        ordinateur, de faire un clic droit sur le bâtiment exact et de copier les coordonnées affichées, plutôt
+        que de dépendre de la géolocalisation du téléphone (qui peut être imprécise en intérieur).
+      </p>
+      <button class="btn btn-outline" style="margin-bottom:8px" :disabled="gpsCapturing" @click="utiliserMaPosition">
+        {{ gpsCapturing ? 'Localisation en cours…' : 'Utiliser ma position actuelle' }}
+      </button>
+      <p v-if="gpsAccuracy !== null" :class="gpsAccuracy > 100 ? 'alert error' : 'muted'" style="margin-bottom:12px">
+        Précision estimée de cette capture : ±{{ gpsAccuracy }} m
+        <span v-if="gpsAccuracy > 100">— trop imprécis pour servir de référence fiable. Sortez à l'extérieur ou à proximité d'une fenêtre et réessayez, ou saisissez les coordonnées manuellement via Google Maps.</span>
+      </p>
       <div class="flex-between">
         <div class="form-group" style="flex:1"><label>Latitude</label><input v-model="config.gpsLat" type="number" step="any" /></div>
         <div class="form-group" style="flex:1"><label>Longitude</label><input v-model="config.gpsLng" type="number" step="any" /></div>
