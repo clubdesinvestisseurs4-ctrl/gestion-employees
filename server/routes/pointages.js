@@ -2,7 +2,6 @@ const express = require('express');
 const { db } = require('../firebase-admin');
 const { authenticateToken, requireRole } = require('../middleware/auth');
 const { calcHeures } = require('../utils/heures');
-const { distanceMetres } = require('../utils/distance');
 const { getClientIp } = require('../utils/ip');
 
 const router = express.Router();
@@ -14,13 +13,13 @@ function todayParts() {
   return { date: now.toISOString().slice(0, 10), heure: now.toISOString().slice(11, 16) };
 }
 
-// POST /api/pointages/scan — appelé après le scan du QR fixe + capture GPS côté employé
+// POST /api/pointages/scan — appelé après le scan du QR fixe côté employé
 router.post('/scan', authenticateToken, async (req, res) => {
   try {
-    const { etablissement, qrToken, lat, lng } = req.body;
+    const { etablissement, qrToken } = req.body;
 
-    if (!etablissement || !qrToken || lat === undefined || lng === undefined) {
-      return res.status(400).json({ error: 'etablissement, qrToken, lat et lng sont requis' });
+    if (!etablissement || !qrToken) {
+      return res.status(400).json({ error: 'etablissement et qrToken sont requis' });
     }
     if (!(req.user.etablissementsAccess || []).includes(etablissement)) {
       return res.status(403).json({ error: "Vous n'avez pas accès à cet établissement" });
@@ -44,14 +43,6 @@ router.post('/scan', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Vous devez être connecté au Wi-Fi de l\'entreprise pour pointer' });
     }
 
-    if (config.gpsLat === null || config.gpsLng === null || config.gpsLat === undefined || config.gpsLng === undefined) {
-      return res.status(409).json({ error: "La position de l'établissement n'est pas configurée, contactez l'admin" });
-    }
-    const dist = distanceMetres(Number(lat), Number(lng), config.gpsLat, config.gpsLng);
-    if (dist > config.gpsRadiusMeters) {
-      return res.status(403).json({ error: `Vous devez être physiquement sur le site pour pointer (distance: ${Math.round(dist)} m)` });
-    }
-
     const { date, heure } = todayParts();
     const docId = `${req.user.id}_${date}`;
     const ref = db.collection('pointages').doc(docId);
@@ -65,8 +56,6 @@ router.post('/scan', authenticateToken, async (req, res) => {
         etablissement,
         date,
         heureArrivee: heure,
-        arriveeLat: Number(lat),
-        arriveeLng: Number(lng),
         arriveeIp: clientIp,
         statutJour: 'en_cours',
         createdAt: new Date().toISOString(),
@@ -79,8 +68,6 @@ router.post('/scan', authenticateToken, async (req, res) => {
       const heures = calcHeures(data.heureArrivee, heure);
       const updates = {
         heureDepart: heure,
-        departLat: Number(lat),
-        departLng: Number(lng),
         departIp: clientIp,
         heures,
         statutJour: 'complet',

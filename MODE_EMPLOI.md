@@ -32,11 +32,9 @@ La connexion administrateur (identifiant + mot de passe classique) se fait sur u
 1. Allez sur l'onglet **Pointer**.
 2. Cliquez sur le bouton **Pointer** : la caméra s'ouvre.
 3. Scannez le QR code affiché à l'entrée de votre établissement.
-4. Autorisez la géolocalisation si demandé.
 
 Le premier scan de la journée enregistre votre **arrivée**, le second votre **départ** (avec calcul automatique des heures travaillées). Le pointage est refusé si :
 - vous n'êtes pas connecté au Wi-Fi de l'entreprise,
-- vous n'êtes pas physiquement sur le site (contrôle GPS),
 - le QR scanné n'est plus valide (régénéré par l'admin).
 
 > **Pourquoi ça parle de "Wi-Fi" mais demande une IP ?** Un téléphone ne peut pas dire à une application le nom du réseau Wi-Fi auquel il est connecté — aucune app web ne peut le lire. Le contrôle se fait donc via l'adresse internet (IP) de la connexion de l'entreprise, qui doit être fixe. Concrètement : si vous êtes bien connecté au Wi-Fi du bureau, ça marche ; sur vos données mobiles ou un autre Wi-Fi, ça sera refusé.
@@ -84,9 +82,8 @@ Pour **chaque établissement**, configurez :
 
 1. **QR code** : cliquez sur "Générer le QR", imprimez l'image et affichez-la à l'entrée. La régénérer invalide l'ancienne (à faire si elle a été perdue ou compromise).
 2. **Adresse(s) IP autorisée(s)** : demandez à quelqu'un connecté au vrai Wi-Fi de l'entreprise d'ouvrir cette page et de cliquer "Utiliser mon IP actuelle". Si votre fournisseur internet change l'IP de temps en temps, il faudra la remettre à jour ici (sinon le pointage cessera de fonctionner pour tous).
-3. **Position GPS** : depuis le site, cliquez "Utiliser ma position actuelle", puis ajustez le rayon toléré (en mètres) si besoin.
 
-Tant que ces trois éléments ne sont pas configurés, le pointage est refusé à tous les employés de cet établissement (sécurité par défaut).
+Tant que ces deux éléments ne sont pas configurés, le pointage est refusé à tous les employés de cet établissement (sécurité par défaut).
 
 ### Pointages
 
@@ -121,8 +118,6 @@ salaire net     = salaire brut − avance déduite
 **"Le pointage n'est pas encore configuré pour cet établissement"** → l'admin doit générer le QR (Paramètres pointage).
 
 **"Vous devez être connecté au Wi-Fi de l'entreprise pour pointer"** → vérifiez la connexion Wi-Fi ; si le problème persiste alors que vous êtes bien au bureau, l'IP de la connexion a peut-être changé — prévenez l'admin.
-
-**"Vous devez être physiquement sur le site"** → la géolocalisation du téléphone est imprécise en intérieur ou désactivée ; vérifiez que la permission de localisation est accordée au navigateur, ou demandez à l'admin d'augmenter le rayon toléré.
 
 **La caméra ne s'ouvre pas** → vérifiez que le site a la permission caméra dans les réglages du navigateur, et que l'app est ouverte en HTTPS (pas en HTTP simple).
 

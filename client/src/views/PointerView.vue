@@ -9,7 +9,6 @@ const message = ref('');
 const messageType = ref('success');
 const popup = ref(null); // { type, title, message }
 const todayPointage = ref(null);
-let positionPromise = null;
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -27,72 +26,9 @@ async function chargerAujourdhui() {
 
 onMounted(chargerAujourdhui);
 
-function geolocationErrorMessage(err) {
-  if (err && err.code === 1) {
-    return "Vous devez autoriser la localisation pour pointer. Activez-la dans les réglages de votre navigateur ou de votre téléphone pour cette application, puis réessayez.";
-  }
-  if (err && err.code === 2) {
-    return 'Impossible de déterminer votre position. Vérifiez que la localisation (GPS) est activée sur votre appareil.';
-  }
-  if (err && err.code === 3) {
-    return 'La localisation a pris trop de temps à répondre. Vérifiez votre connexion et réessayez.';
-  }
-  return "Impossible d'obtenir votre position. Vérifiez que la localisation est activée.";
-}
-
-function getPositionOnce(options) {
-  return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition((pos) => resolve(pos.coords), reject, options);
-  });
-}
-
-async function getPosition() {
-  if (!navigator.geolocation) {
-    throw new Error("La géolocalisation n'est pas disponible sur cet appareil");
-  }
-  try {
-    // 1ère tentative : haute précision (GPS), peut être lente en intérieur.
-    return await getPositionOnce({ enableHighAccuracy: true, timeout: 20000 });
-  } catch {
-    // Repli : position réseau/Wi-Fi (moins précise mais plus rapide à obtenir),
-    // accepte une position récente déjà connue de l'appareil pour répondre plus vite.
-    try {
-      return await getPositionOnce({ enableHighAccuracy: false, timeout: 12000, maximumAge: 30000 });
-    } catch (err) {
-      throw new Error(geolocationErrorMessage(err));
-    }
-  }
-}
-
-async function startPointage() {
+function startPointage() {
   message.value = '';
   popup.value = null;
-
-  // Si la localisation est déjà refusée, on le dit tout de suite plutôt que d'ouvrir la
-  // caméra pour rien (l'employé doit d'abord activer ce qu'il faut).
-  if (navigator.permissions) {
-    try {
-      const status = await navigator.permissions.query({ name: 'geolocation' });
-      if (status.state === 'denied') {
-        popup.value = {
-          type: 'error',
-          title: 'Localisation désactivée',
-          message: "Vous devez activer la localisation pour pointer. Allez dans les réglages de votre navigateur ou de votre téléphone pour l'autoriser pour cette application, puis réessayez.",
-        };
-        return;
-      }
-    } catch { /* Permissions API non disponible pour 'geolocation' sur ce navigateur */ }
-  }
-
-  // Demande la position en parallèle de l'ouverture de la caméra : les deux demandes
-  // d'activation (localisation + caméra) sortent dès le clic, sans attendre le scan du QR.
-  positionPromise = getPosition();
-  positionPromise.catch((err) => {
-    if (phase.value === 'scanning') {
-      phase.value = 'idle';
-      popup.value = { type: 'error', title: 'Pointage refusé', message: err.message };
-    }
-  });
   phase.value = 'scanning';
 }
 
@@ -110,13 +46,7 @@ async function onScan(decodedText) {
       throw new Error('QR code non reconnu');
     }
 
-    const coords = await positionPromise;
-    const result = await api.post('/api/pointages/scan', {
-      etablissement,
-      qrToken,
-      lat: coords.latitude,
-      lng: coords.longitude,
-    });
+    const result = await api.post('/api/pointages/scan', { etablissement, qrToken });
 
     messageType.value = 'success';
     message.value = result.type === 'arrivee'
@@ -173,7 +103,7 @@ function onScanError(err) {
 
     <div class="card muted">
       Scannez le QR code affiché à l'entrée de votre établissement. Vous devez être connecté au Wi-Fi
-      de l'entreprise et physiquement sur le site pour que le pointage soit accepté.
+      de l'entreprise pour que le pointage soit accepté.
     </div>
 
     <Modal

@@ -12,9 +12,6 @@ const DEFAULT_CONFIG = {
   qrToken: null,
   qrGeneratedAt: null,
   allowedIps: [],
-  gpsLat: null,
-  gpsLng: null,
-  gpsRadiusMeters: 150,
 };
 
 // GET /api/sites-config/ip-actuelle — utilisé par le bouton "Utiliser mon IP actuelle"
@@ -32,10 +29,10 @@ router.get('/:etablissement', authenticateToken, requireRole('admin'), requireEt
   }
 });
 
-// PUT /api/sites-config/:etablissement — admin only, met à jour IP/GPS
+// PUT /api/sites-config/:etablissement — admin only, met à jour les IP autorisées
 router.put('/:etablissement', authenticateToken, requireRole('admin'), requireEtablissementAccess, async (req, res) => {
   try {
-    const { allowedIps, gpsLat, gpsLng, gpsRadiusMeters } = req.body;
+    const { allowedIps } = req.body;
     const updates = {};
     if (allowedIps !== undefined) {
       if (!Array.isArray(allowedIps)) {
@@ -43,9 +40,6 @@ router.put('/:etablissement', authenticateToken, requireRole('admin'), requireEt
       }
       updates.allowedIps = allowedIps;
     }
-    if (gpsLat !== undefined) updates.gpsLat = Number(gpsLat);
-    if (gpsLng !== undefined) updates.gpsLng = Number(gpsLng);
-    if (gpsRadiusMeters !== undefined) updates.gpsRadiusMeters = Number(gpsRadiusMeters);
 
     const ref = db.collection('sitesConfig').doc(req.params.etablissement);
     await ref.set(updates, { merge: true });

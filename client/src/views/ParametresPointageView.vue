@@ -9,21 +9,14 @@ const success = ref('');
 const qrImage = ref('');
 const nouvelleIp = ref('');
 
-const config = reactive({ allowedIps: [], gpsLat: null, gpsLng: null, gpsRadiusMeters: 150 });
-const gpsAccuracy = ref(null);
-const gpsCapturing = ref(false);
+const config = reactive({ allowedIps: [] });
 
 async function charger() {
   if (!auth.etablissementActif) return;
   error.value = '';
   try {
     const data = await api.get(`/api/sites-config/${auth.etablissementActif}`);
-    Object.assign(config, {
-      allowedIps: data.allowedIps || [],
-      gpsLat: data.gpsLat,
-      gpsLng: data.gpsLng,
-      gpsRadiusMeters: data.gpsRadiusMeters || 150,
-    });
+    Object.assign(config, { allowedIps: data.allowedIps || [] });
     if (data.qrToken) {
       const img = await api.get(`/api/sites-config/${auth.etablissementActif}/qr-image`);
       qrImage.value = img.qrImage;
@@ -61,25 +54,6 @@ function retirerIp(ip) {
   config.allowedIps = config.allowedIps.filter((i) => i !== ip);
 }
 
-function utiliserMaPosition() {
-  error.value = '';
-  gpsAccuracy.value = null;
-  gpsCapturing.value = true;
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      config.gpsLat = pos.coords.latitude;
-      config.gpsLng = pos.coords.longitude;
-      gpsAccuracy.value = Math.round(pos.coords.accuracy);
-      gpsCapturing.value = false;
-    },
-    (err) => {
-      error.value = 'Impossible d\'obtenir votre position : ' + err.message;
-      gpsCapturing.value = false;
-    },
-    { enableHighAccuracy: true, timeout: 20000 }
-  );
-}
-
 async function enregistrer() {
   error.value = ''; success.value = '';
   try {
@@ -99,7 +73,7 @@ async function enregistrer() {
 
     <div class="card">
       <h3 style="margin-top:0">QR code à afficher à l'entrée</h3>
-      <p class="muted">Imprimez ce QR et affichez-le à l'entrée du site. Le scanner seul ne suffit pas : l'employé doit aussi être connecté au Wi-Fi de l'entreprise et physiquement sur le site (GPS).</p>
+      <p class="muted">Imprimez ce QR et affichez-le à l'entrée du site. Le scanner seul ne suffit pas : l'employé doit aussi être connecté au Wi-Fi de l'entreprise.</p>
       <div v-if="qrImage" style="text-align:center">
         <img :src="qrImage" alt="QR pointage" style="width:240px" />
       </div>
@@ -125,27 +99,6 @@ async function enregistrer() {
         </li>
       </ul>
       <p v-if="!config.allowedIps.length" class="muted">Aucune IP configurée — le pointage sera refusé pour tous tant qu'aucune IP n'est ajoutée.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0">Position GPS du site</h3>
-      <p class="muted">
-        Pour un lieu fixe (hôtel, restaurant), le plus fiable est de chercher l'adresse sur Google Maps sur un
-        ordinateur, de faire un clic droit sur le bâtiment exact et de copier les coordonnées affichées, plutôt
-        que de dépendre de la géolocalisation du téléphone (qui peut être imprécise en intérieur).
-      </p>
-      <button class="btn btn-outline" style="margin-bottom:8px" :disabled="gpsCapturing" @click="utiliserMaPosition">
-        {{ gpsCapturing ? 'Localisation en cours…' : 'Utiliser ma position actuelle' }}
-      </button>
-      <p v-if="gpsAccuracy !== null" :class="gpsAccuracy > 100 ? 'alert error' : 'muted'" style="margin-bottom:12px">
-        Précision estimée de cette capture : ±{{ gpsAccuracy }} m
-        <span v-if="gpsAccuracy > 100">— trop imprécis pour servir de référence fiable. Sortez à l'extérieur ou à proximité d'une fenêtre et réessayez, ou saisissez les coordonnées manuellement via Google Maps.</span>
-      </p>
-      <div class="flex-between">
-        <div class="form-group" style="flex:1"><label>Latitude</label><input v-model="config.gpsLat" type="number" step="any" /></div>
-        <div class="form-group" style="flex:1"><label>Longitude</label><input v-model="config.gpsLng" type="number" step="any" /></div>
-        <div class="form-group" style="flex:1"><label>Rayon toléré (m)</label><input v-model="config.gpsRadiusMeters" type="number" min="10" /></div>
-      </div>
     </div>
 
     <button class="btn" @click="enregistrer">Enregistrer les paramètres</button>
