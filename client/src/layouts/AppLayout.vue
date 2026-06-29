@@ -137,9 +137,33 @@ function logout() {
 }
 
 @media (max-width: 768px) {
-  .sidebar { width: 100%; height: auto; position: static; flex-direction: row; overflow-x: auto; }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px 4px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+  }
   .sidebar-brand, .sidebar-user { display: none; }
-  .nav-link { white-space: nowrap; }
+  nav { display: flex; width: 100%; }
+  .nav-link {
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+    padding: 6px 4px;
+    font-size: 11px;
+    text-align: center;
+    justify-content: center;
+  }
   .main-wrapper { margin-left: 0; }
+  .content { padding-bottom: 76px; }
 }
 </style>

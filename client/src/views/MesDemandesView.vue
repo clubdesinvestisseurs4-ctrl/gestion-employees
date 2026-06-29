@@ -142,6 +142,7 @@ function detail(d) {
 
     <div class="card">
       <h3 style="margin-top:0">Historique</h3>
+      <div class="table-wrap">
       <table>
         <thead><tr><th>Type</th><th>Détail</th><th>Statut</th><th>Commentaire admin</th></tr></thead>
         <tbody>
@@ -154,6 +155,7 @@ function detail(d) {
           <tr v-if="!demandes.length"><td colspan="4" class="muted">Aucune demande</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>

@@ -79,7 +79,8 @@ async function valider() {
   padding: 16px;
 }
 .login-card {
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
   text-align: center;
 }
 .login-brand {

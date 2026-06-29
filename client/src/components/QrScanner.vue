@@ -8,6 +8,20 @@ const starting = ref(true);
 let html5QrCode = null;
 let stopped = false;
 
+function messageCamera(err) {
+  const s = String(err?.name || err?.message || err || '');
+  if (/NotAllowedError|Permission/i.test(s)) {
+    return "Vous devez autoriser l'accès à la caméra pour pointer. Activez-la dans les réglages de votre navigateur ou de votre téléphone, puis réessayez.";
+  }
+  if (/NotFoundError/i.test(s)) {
+    return 'Aucune caméra détectée sur cet appareil.';
+  }
+  if (/NotReadableError|TrackStart/i.test(s)) {
+    return 'La caméra est déjà utilisée par une autre application. Fermez-la puis réessayez.';
+  }
+  return "Impossible d'accéder à la caméra. Vérifiez les autorisations puis réessayez.";
+}
+
 onMounted(async () => {
   html5QrCode = new Html5Qrcode(containerId);
   try {
@@ -17,14 +31,17 @@ onMounted(async () => {
       async (decodedText) => {
         if (stopped) return;
         stopped = true;
-        emit('scan', decodedText);
+        // Arrêt complet de la caméra avant de notifier le parent : appeler stop() une seule
+        // fois ici évite la course avec onBeforeUnmount (double stop() concurrent qui pouvait
+        // laisser le flux caméra bloqué et empêcher tout nouveau scan).
         try { await html5QrCode.stop(); } catch { /* déjà arrêté */ }
+        emit('scan', decodedText);
       },
       () => {} // erreurs de scan "frame sans QR" ignorées en continu
     );
     starting.value = false;
   } catch (err) {
-    emit('error', err?.message || 'Impossible d\'accéder à la caméra');
+    emit('error', messageCamera(err));
   }
 });
 
@@ -41,7 +58,10 @@ onBeforeUnmount(async () => {
 
 <template>
   <div class="qr-scanner">
-    <div v-if="starting" class="muted">Ouverture de la caméra…</div>
+    <div v-if="starting" class="qr-starting">
+      <div class="spinner"></div>
+      <p class="muted" style="margin:10px 0 0">Ouverture de la caméra…</p>
+    </div>
     <div :id="containerId" class="qr-reader-box"></div>
   </div>
 </template>
@@ -54,4 +74,5 @@ onBeforeUnmount(async () => {
   border-radius: 12px;
   overflow: hidden;
 }
+.qr-starting { padding: 24px 0; }
 </style>

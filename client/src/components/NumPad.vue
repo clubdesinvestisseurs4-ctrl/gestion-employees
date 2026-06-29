@@ -47,19 +47,21 @@ function clear() {
 .numpad-display {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 .numpad-cell {
-  width: 44px;
-  height: 56px;
+  width: 40px;
+  height: 52px;
   border: 2px solid var(--border);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 .numpad-cell.filled {
   border-color: var(--color-primary);

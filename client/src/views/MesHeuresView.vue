@@ -53,6 +53,7 @@ watch(periode, charger);
 
     <div class="card">
       <h3 style="margin-top:0">Détail des pointages</h3>
+      <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Date</th><th>Arrivée</th><th>Départ</th><th>Heures</th><th>Statut</th></tr>
@@ -68,6 +69,7 @@ watch(periode, charger);
           <tr v-if="!pointages.length"><td colspan="5" class="muted">Aucun pointage pour cette période</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>

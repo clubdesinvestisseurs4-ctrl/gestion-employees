@@ -58,9 +58,11 @@ async function submit() {
   align-items: center;
   justify-content: center;
   background: var(--bg-sidebar);
+  padding: 16px;
 }
 .login-card {
-  width: 340px;
+  width: 100%;
+  max-width: 340px;
 }
 .login-brand {
   font-size: 20px;

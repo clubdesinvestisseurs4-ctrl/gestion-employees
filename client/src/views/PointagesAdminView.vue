@@ -64,6 +64,7 @@ async function saveEdit(p) {
     <div v-if="error" class="alert error">{{ error }}</div>
 
     <div class="card">
+      <div class="table-wrap">
       <table>
         <thead><tr><th>Date</th><th>Employé</th><th>Arrivée</th><th>Départ</th><th>Heures</th><th>Statut</th><th></th></tr></thead>
         <tbody>
@@ -88,6 +89,7 @@ async function saveEdit(p) {
           <tr v-if="!pointages.length"><td colspan="7" class="muted">Aucun pointage pour cette période</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>

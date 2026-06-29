@@ -140,6 +140,7 @@ async function reinitialiser(e) {
     </div>
 
     <div class="card">
+      <div class="table-wrap">
       <table>
         <thead><tr><th>Matricule</th><th>Code connexion</th><th>Nom</th><th>Poste</th><th>Salaire mensuel</th><th>Établissements</th><th></th></tr></thead>
         <tbody>
@@ -163,6 +164,7 @@ async function reinitialiser(e) {
           <tr v-if="!employes.length"><td colspan="7" class="muted">Aucun employé</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>

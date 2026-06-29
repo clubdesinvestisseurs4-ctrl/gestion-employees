@@ -60,6 +60,7 @@ async function changerStatut(f, statut) {
     <div v-if="success" class="alert success">{{ success }}</div>
 
     <div class="card">
+      <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Employé</th><th>Heures</th><th>Salaire brut</th><th>Avance déduite</th><th>Net</th><th>Statut</th><th></th></tr>
@@ -80,6 +81,7 @@ async function changerStatut(f, statut) {
           <tr v-if="!fiches.length"><td colspan="7" class="muted">Aucune fiche pour cette période — cliquez sur "Générer les fiches du mois"</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </template>
