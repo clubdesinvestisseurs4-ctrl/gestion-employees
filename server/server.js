@@ -56,6 +56,7 @@ app.use('/api/sites-config', require('./routes/sitesConfig'));
 app.use('/api/pointages', require('./routes/pointages'));
 app.use('/api/demandes', require('./routes/demandes'));
 app.use('/api/salaires', require('./routes/salaires'));
+app.use('/api/integration', require('./routes/integration'));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'Gestion Employés API' });
