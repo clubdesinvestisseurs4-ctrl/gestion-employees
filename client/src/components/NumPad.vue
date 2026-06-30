@@ -62,10 +62,17 @@ function clear() {
   font-size: 24px;
   font-weight: 700;
   flex-shrink: 0;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 .numpad-cell.filled {
   border-color: var(--color-primary);
   background: #f0f7f2;
+  animation: cellPop 0.2s ease;
+}
+@keyframes cellPop {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 .numpad-grid {
   display: grid;
@@ -80,9 +87,14 @@ function clear() {
   border-radius: 12px;
   background: #fff;
   cursor: pointer;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+.numpad-btn:hover {
+  border-color: var(--color-primary);
 }
 .numpad-btn:active {
   background: #f0f7f2;
+  transform: scale(0.93);
 }
 .numpad-btn-action {
   font-size: 18px;

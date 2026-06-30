@@ -73,6 +73,13 @@ onBeforeUnmount(async () => {
   margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
+  border: 2px solid var(--color-primary);
+  animation: scanPulse 1.6s ease-in-out infinite;
 }
-.qr-starting { padding: 24px 0; }
+.qr-starting { padding: 24px 0; animation: fadeInUp 0.3s ease both; }
+
+@keyframes scanPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(26,107,60,0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(26,107,60,0); }
+}
 </style>

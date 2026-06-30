@@ -80,21 +80,24 @@ function onScanError(err) {
 
       <div v-if="message" :class="['alert', messageType]">{{ message }}</div>
 
-      <QrScanner v-if="phase === 'scanning'" @scan="onScan" @error="onScanError" />
+      <Transition name="fade" mode="out-in">
+        <QrScanner v-if="phase === 'scanning'" key="scanning" @scan="onScan" @error="onScanError" />
 
-      <div v-else-if="phase === 'validating'" class="validating">
-        <div class="spinner"></div>
-        <p class="muted" style="margin:10px 0 0">Validation en cours…</p>
-      </div>
+        <div v-else-if="phase === 'validating'" key="validating" class="validating">
+          <div class="spinner"></div>
+          <p class="muted" style="margin:10px 0 0">Validation en cours…</p>
+        </div>
 
-      <button
-        v-else
-        class="btn btn-lg"
-        :disabled="todayPointage && todayPointage.heureDepart"
-        @click="startPointage"
-      >
-        Pointer
-      </button>
+        <button
+          v-else
+          key="idle"
+          class="btn btn-lg"
+          :disabled="todayPointage && todayPointage.heureDepart"
+          @click="startPointage"
+        >
+          Pointer
+        </button>
+      </Transition>
 
       <p v-if="todayPointage && todayPointage.heureDepart" class="muted" style="margin-top:14px">
         Vous avez déjà pointé votre arrivée et votre départ aujourd'hui.

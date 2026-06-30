@@ -100,11 +100,15 @@ function logout() {
   color: #d7e6dc;
   font-size: 14px;
   margin-bottom: 4px;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
 }
 .nav-link:hover, .nav-link.router-link-active {
   background: rgba(255,255,255,0.12);
   color: #fff;
 }
+.nav-link:active { transform: scale(0.96); }
+.nav-link span { transition: transform 0.18s ease; }
+.nav-link.router-link-active span { transform: scale(1.15); }
 .sidebar-user {
   margin-top: auto;
   padding: 12px 8px;
