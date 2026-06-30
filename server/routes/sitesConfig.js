@@ -25,7 +25,8 @@ router.get('/:etablissement', authenticateToken, requireRole('admin'), requireEt
     const doc = await db.collection('sitesConfig').doc(req.params.etablissement).get();
     res.json(doc.exists ? doc.data() : DEFAULT_CONFIG);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -46,7 +47,8 @@ router.put('/:etablissement', authenticateToken, requireRole('admin'), requireEt
     const updated = await ref.get();
     res.json(updated.data());
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -63,7 +65,8 @@ router.post('/:etablissement/regenerer-qr', authenticateToken, requireRole('admi
 
     res.json({ qrToken, qrImage });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -79,7 +82,8 @@ router.get('/:etablissement/qr-image', authenticateToken, requireRole('admin'), 
     const qrImage = await QRCode.toDataURL(payload, { width: 400, margin: 2 });
     res.json({ qrToken, qrImage });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

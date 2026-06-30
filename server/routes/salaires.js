@@ -29,7 +29,8 @@ router.get('/estimation', authenticateToken, async (req, res) => {
     const estimation = await calculerSalaire(doc.data(), employeId, periode);
     res.json({ employeId, periode, ...estimation });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -72,7 +73,8 @@ router.post('/:etablissement/generer', authenticateToken, requireRole('admin'), 
 
     res.status(201).json({ message: `${fichesCreees.length} fiche(s) générée(s)`, fiches: fichesCreees });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -90,7 +92,8 @@ router.get('/:etablissement', authenticateToken, requireRole('admin'), async (re
     fiches.sort((a, b) => (a.employeNom > b.employeNom ? 1 : -1));
     res.json(fiches);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -122,7 +125,8 @@ router.patch('/:id', authenticateToken, requireRole('admin'), async (req, res) =
     const updated = await ref.get();
     res.json({ id: updated.id, ...updated.data() });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

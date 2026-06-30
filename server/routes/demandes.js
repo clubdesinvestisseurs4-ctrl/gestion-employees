@@ -64,7 +64,8 @@ router.post('/', authenticateToken, async (req, res) => {
     const ref = await db.collection('demandes').add(demande);
     res.status(201).json({ id: ref.id, ...demande });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -76,7 +77,8 @@ router.get('/moi', authenticateToken, async (req, res) => {
     demandes.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     res.json(demandes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -95,7 +97,8 @@ router.get('/', authenticateToken, requireRole('admin'), async (req, res) => {
     demandes.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     res.json(demandes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -123,7 +126,8 @@ router.patch('/:id', authenticateToken, requireRole('admin'), async (req, res) =
     const updated = await ref.get();
     res.json({ id: updated.id, ...updated.data() });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -146,7 +150,8 @@ router.post('/:id/verser', authenticateToken, requireRole('admin'), async (req, 
     const updated = await ref.get();
     res.json({ id: updated.id, ...updated.data() });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

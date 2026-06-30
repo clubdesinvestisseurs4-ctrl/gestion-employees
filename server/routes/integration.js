@@ -30,7 +30,8 @@ router.get('/employes', authenticateService, async (req, res) => {
     employes.sort((a, b) => a.nom.localeCompare(b.nom));
     res.json(employes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -50,7 +51,8 @@ router.get('/pointages', authenticateService, async (req, res) => {
     pointages.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     res.json(pointages);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -82,7 +84,8 @@ router.get('/paie', authenticateService, async (req, res) => {
     }
     res.json(resultats);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -98,7 +101,8 @@ router.post('/avances/decrementer', authenticateService, async (req, res) => {
     await decrementerAvances(employeId, Number(montant));
     res.json({ message: 'Solde avance mis à jour' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

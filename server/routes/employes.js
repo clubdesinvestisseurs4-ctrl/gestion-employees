@@ -33,7 +33,8 @@ router.get('/', authenticateToken, async (req, res) => {
     employes.sort((a, b) => `${a.nom}${a.prenom}`.localeCompare(`${b.nom}${b.prenom}`));
     res.json(employes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -93,7 +94,8 @@ router.post('/', authenticateToken, requireRole('admin'), async (req, res) => {
     const { pinHash: _, ...safe } = employe;
     res.status(201).json({ id: ref.id, ...safe });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -131,7 +133,8 @@ router.put('/:id', authenticateToken, requireRole('admin'), async (req, res) => 
     const updated = await ref.get();
     res.json(publicEmploye(updated));
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -153,7 +156,8 @@ router.post('/:id/reinitialiser-pin', authenticateToken, requireRole('admin'), a
     await ref.update({ pinHash, pinFailedAttempts: 0, pinLockedUntil: null });
     res.json({ message: 'PIN réinitialisé' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -168,7 +172,8 @@ router.delete('/:id', authenticateToken, requireRole('admin'), async (req, res) 
     await ref.update({ actif: false });
     res.json({ message: 'Employé désactivé' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

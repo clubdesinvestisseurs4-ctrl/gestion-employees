@@ -57,7 +57,8 @@ router.post('/seed', async (req, res) => {
       user: publicUser(ref.id, admin),
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -90,7 +91,8 @@ router.post('/login', async (req, res) => {
     const token = buildToken(user, doc.id);
     res.json({ token, user: publicUser(doc.id, user) });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -142,7 +144,8 @@ router.post('/login-employe', async (req, res) => {
     const token = buildToken(user, doc.id);
     res.json({ token, user: publicUser(doc.id, user) });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -169,7 +172,8 @@ router.post('/changer-pin', authenticateToken, async (req, res) => {
     await ref.update({ pinHash });
     res.json({ message: 'PIN mis à jour' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -199,7 +203,8 @@ router.post('/changer-mot-de-passe', authenticateToken, async (req, res) => {
     await ref.update({ passwordHash });
     res.json({ message: 'Mot de passe mis à jour' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 

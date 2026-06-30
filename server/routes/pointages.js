@@ -78,7 +78,8 @@ router.post('/scan', authenticateToken, async (req, res) => {
 
     return res.status(409).json({ error: 'Vous avez déjà pointé votre arrivée et votre départ aujourd\'hui' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -105,7 +106,8 @@ router.get('/', authenticateToken, async (req, res) => {
     pointages.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
     res.json(pointages);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
@@ -141,7 +143,8 @@ router.put('/:id', authenticateToken, requireRole('admin'), async (req, res) => 
     const updated = await ref.get();
     res.json({ id: updated.id, ...updated.data() });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Erreur interne du serveur' });
   }
 });
 
