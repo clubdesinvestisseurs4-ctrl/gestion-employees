@@ -2,24 +2,25 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import NavIcon from '../components/NavIcon.vue';
 
 const auth = useAuthStore();
 const router = useRouter();
 
 const navEmploye = [
-  { to: '/pointer', label: 'Pointer', icon: '📷' },
-  { to: '/mes-heures', label: 'Mes heures & salaire', icon: '💰' },
-  { to: '/mes-demandes', label: 'Mes demandes', icon: '📝' },
-  { to: '/profil', label: 'Profil', icon: '👤' },
+  { to: '/pointer', label: 'Pointer', icon: 'camera' },
+  { to: '/mes-heures', label: 'Mes heures & salaire', icon: 'wallet' },
+  { to: '/mes-demandes', label: 'Mes demandes', icon: 'clipboard' },
+  { to: '/profil', label: 'Profil', icon: 'user' },
 ];
 
 const navAdmin = [
-  { to: '/admin', label: 'Tableau de bord', icon: '📊' },
-  { to: '/admin/employes', label: 'Employés', icon: '👥' },
-  { to: '/admin/pointages', label: 'Pointages', icon: '🕒' },
-  { to: '/admin/demandes', label: 'Demandes', icon: '📥' },
-  { to: '/admin/salaires', label: 'Salaires', icon: '💰' },
-  { to: '/admin/parametres-pointage', label: 'Paramètres pointage', icon: '⚙️' },
+  { to: '/admin', label: 'Tableau de bord', icon: 'chart' },
+  { to: '/admin/employes', label: 'Employés', icon: 'users' },
+  { to: '/admin/pointages', label: 'Pointages', icon: 'clock' },
+  { to: '/admin/demandes', label: 'Demandes', icon: 'inbox' },
+  { to: '/admin/salaires', label: 'Salaires', icon: 'wallet' },
+  { to: '/admin/parametres-pointage', label: 'Paramètres pointage', icon: 'settings' },
 ];
 
 const nav = computed(() => (auth.isAdmin ? navAdmin : navEmploye));
@@ -41,8 +42,9 @@ function logout() {
     <aside class="sidebar">
       <div class="sidebar-brand">Gestion Employés</div>
       <nav>
-        <router-link v-for="item in nav" :key="item.to" :to="item.to" class="nav-link">
-          <span>{{ item.icon }}</span> {{ item.label }}
+        <router-link v-for="item in nav" :key="item.to" :to="item.to" class="nav-link" :aria-label="item.label">
+          <NavIcon :name="item.icon" />
+          <span class="nav-label">{{ item.label }}</span>
         </router-link>
       </nav>
       <div class="sidebar-user">
@@ -107,8 +109,8 @@ function logout() {
   color: #fff;
 }
 .nav-link:active { transform: scale(0.96); }
-.nav-link span { transition: transform 0.18s ease; }
-.nav-link.router-link-active span { transform: scale(1.15); }
+.nav-link :deep(.nav-icon) { transition: transform 0.18s ease; }
+.nav-link.router-link-active :deep(.nav-icon) { transform: scale(1.12); }
 .sidebar-user {
   margin-top: auto;
   padding: 12px 8px;
@@ -159,15 +161,17 @@ function logout() {
   nav { display: flex; width: 100%; }
   .nav-link {
     flex: 1;
-    flex-direction: column;
-    gap: 2px;
-    white-space: nowrap;
-    padding: 6px 4px;
-    font-size: 11px;
-    text-align: center;
     justify-content: center;
+    padding: 10px 4px;
+    border-radius: 12px;
+    margin-bottom: 0;
+  }
+  .nav-link .nav-label { display: none; }
+  .nav-link :deep(.nav-icon) {
+    width: 25px;
+    height: 25px;
   }
   .main-wrapper { margin-left: 0; }
-  .content { padding-bottom: 76px; }
+  .content { padding-bottom: 72px; }
 }
 </style>
